@@ -1,0 +1,69 @@
+- hosts: vcenter
+  gather_facts: false
+  tasks:
+    - raw: |
+             shell
+             chsh -s /bin/bash root
+
+- hosts: vcenter
+  tasks:
+    - systemd:
+        state: stopped
+        name: '{{ item }}'
+      with_items:
+        - multi-user.target
+        - applmgmt
+        - getty@tty1.service
+        - getty@tty2.service
+        - vami-lighttp
+        - dnsmasq
+        - vmafdd
+        - vmcad
+        - vmdird
+        - vmdnsd
+        - vmtoolsd
+        - vmware-firewall
+        - vmware-pod
+        - xinetd
+        - vmware-vpxd
+        - vmware-stsd
+        - vmware-sts-idmd
+        - vmware-vmon
+        - syslog
+        - syslog.socket
+    - command: "pkill -f '/usr/bin/python /usr/lib/applmgmt/ddns/py/ddns.py'"
+      ignore_errors: yes
+
+    - shell: |
+        set -eux
+        for mount_point in $(mount|awk '/mapper/ { print $3 }'); do
+            echo $mount_point
+            if ! test -d ${mount_point}.new; then
+                cp -Rvpa ${mount_point} ${mount_point}.new
+            fi
+            umount ${mount_point}
+            rm -r ${mount_point}
+            mv -f ${mount_point}.new ${mount_point}
+        done
+    - copy:
+        dest: /etc/fstab
+        content: |
+            /dev/vda3 / ext4 defaults 1 1
+            /dev/vda2       swap    swap    defaults        0       0
+            /dev/vda1 /boot ext4 defaults,nosuid,noacl,nodev,noexec 1 2
+            /dev/cdrom /mnt/cdrom iso9660 ro,noauto,nosuid,nodev 0 0
+    - copy:
+        dest: /etc/systemd/network/10-eth0.network
+        content: |
+            [Match]
+            Name=eth0
+            [Network]
+            DHCP=yes
+            [DHCP]
+            UseDNS=yes
+    - copy:
+        dest: /etc/systemd/resolved.conf
+        content: |
+            [Resolve]
+            LLMNR=false
+

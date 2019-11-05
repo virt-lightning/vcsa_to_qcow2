@@ -1,0 +1,11 @@
+- hosts: localhost
+  tasks:
+    - name: Wait for the virtual machine to shutdown
+      vmware_guest_powerstate:
+        hostname: 192.168.123.5
+        username: root
+        password: '!234AaAa56'
+        validate_certs: no
+        name: vCenter-Server-Appliance
+        state: shutdown-guest
+        state_change_timeout: 200
