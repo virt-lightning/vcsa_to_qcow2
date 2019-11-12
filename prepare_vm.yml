@@ -83,3 +83,54 @@
             [Resolve]
             LLMNR=false
 
+    - name: Inject the SSH key in /root/.ssh/authorized_keys
+      copy:
+        dest: /etc/cloud/cloud.cfg
+        content: |
+
+            users:
+               - name: root
+                 lock-passwd: false
+            disable_root: false
+            disable_vmware_customization: true
+            preserve_hostname: false
+            datasource_list: [
+                              NoCloud,
+                              ConfigDrive,
+                              OpenStack,
+                              None
+                             ]
+            cloud_init_modules:
+             - bootcmd
+             - write-files
+             - growpart
+             - resizefs
+             - set_hostname
+             - update_hostname
+             - users-groups
+             - ssh
+            cloud_config_modules:
+             - package-update-upgrade-install
+             - runcmd
+             - yum-add-repo
+            cloud_final_modules:
+             - scripts-vendor
+             - scripts-per-once
+             - scripts-per-boot
+             - scripts-per-instance
+             - scripts-user
+             - ssh-authkey-fingerprints
+             - final-message
+            system_info:
+               distro: photon
+               paths:
+                  cloud_dir: /var/lib/cloud/
+                  templates_dir: /etc/cloud/templates/
+               default_user:
+                 name: root
+                 lock_passwd: False
+               ssh_svcname: sshd
+    - lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin No'
