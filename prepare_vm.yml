@@ -61,6 +61,22 @@
             DHCP=yes
             [DHCP]
             UseDNS=yes
+            UseMTU=yes
+    - copy:
+        dest: /lib/systemd/system/mtu_fix.service
+        content: |
+            [Unit]
+            Description=Work around for https://github.com/systemd/systemd/issues/9102
+            After=local-fs.target network-online.target network.target
+            Wants=local-fs.target network-online.target network.target
+            [Service]
+            ExecStart=/bin/bash -c "/bin/sleep 5; /usr/bin/systemctl restart systemd-networkd"
+            Type=oneshot
+            [Install]
+            WantedBy=multi-user.target
+    - systemd:
+        enabled: true
+        name: mtu_fix
     - copy:
         dest: /etc/systemd/resolved.conf
         content: |
