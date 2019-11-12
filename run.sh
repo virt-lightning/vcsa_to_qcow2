@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export VERSION=VMware-VCSA-all-6.7.0-14367737
 vl up
 vl ansible_inventory>inventory
 ansible-playbook install_vcsa.yml -i inventory
@@ -13,5 +14,5 @@ ansible-playbook shutdown_esxi.yml
 ssh root@192.168.123.5 sh -c 'reboot&'
 sleep 300
 curl -v -k --user 'root:!234AaAa56' -o vCenterServerAppliance.raw 'https://192.168.123.5/folder/vCenter-Server-Appliance/vCenter-Server-Appliance-flat.vmdk?dcPath=ha%252ddatacenter&dsName=local'
-qemu-img convert -f raw -O qcow2 -c vCenterServerAppliance.raw vCenterServerAppliance.qcow2
+qemu-img convert -f raw -O qcow2 -c vCenterServerAppliance.raw ${VERSION}.qcow2
 vl down
