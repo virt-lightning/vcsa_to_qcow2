@@ -9,8 +9,8 @@ echo 'vcenter ansible_host=192.168.123.90 ansible_user=root ansible_password="!2
 
 ansible-playbook prepare_vm.yml -i inventory
 
-# If we don't reboot the ESXi, the download fails with an err 500
-ansible-playbook shutdown_esxi.yml
+# If we don't reboot the ESXi, the download fails with an err 500, probably because the VM disks are still used
+ansible-playbook shutdown_esxi.yml -i inventory
 ssh root@192.168.123.5 sh -c 'reboot&'
 sleep 300
 curl -v -k --user 'root:!234AaAa56' -o vCenterServerAppliance.raw 'https://192.168.123.5/folder/vCenter-Server-Appliance/vCenter-Server-Appliance-flat.vmdk?dcPath=ha%252ddatacenter&dsName=local'

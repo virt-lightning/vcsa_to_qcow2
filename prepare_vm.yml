@@ -4,6 +4,8 @@
     - raw: |
              shell
              chsh -s /bin/bash root
+    - meta: reset_connection
+      become: true
 
 - hosts: vcenter
   tasks:
