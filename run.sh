@@ -16,3 +16,12 @@ sleep 300
 curl -v -k --user 'root:!234AaAa56' -o vCenterServerAppliance.raw 'https://192.168.123.5/folder/vCenter-Server-Appliance/vCenter-Server-Appliance-flat.vmdk?dcPath=ha%252ddatacenter&dsName=local'
 qemu-img convert -f raw -O qcow2 -c vCenterServerAppliance.raw ${VERSION}.qcow2
 vl down
+
+echo "You image is ready! Do use it:
+    Virt-Lightning:
+        sudo cp -v ${VERSION}.qcow2 default_config.yaml /var/lib/virt-lightning/pool/upstream/
+        sudo cp -v default_config.yaml /var/lib/virt-lightning/pool/upstream/${VERSION}.yaml
+
+    OpenStack:
+        source ~/openrc.sh
+        openstack image create --disk-format qcow2 --container-format bare --file ${VERSION}.qcow2 --property hw_vif_model=e1000 --property hw_qemu_guest_agent=no --min-disk 20 --min-ram 9000 ${VERSION}"
