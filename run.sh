@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -eux
 export VERSION=VMware-VCSA-all-6.7.0-14367737
 vl up
 vl ansible_inventory>inventory
