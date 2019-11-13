@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eux
-export VERSION=VMware-VCSA-all-6.7.0-14367737
+export VERSION=VMware-VCSA-all-6.7.0-14836122
 vl up
 vl ansible_inventory>inventory
 ansible-playbook install_vcsa.yml -i inventory -e vcenter_instance.installation.iso_path=~/Downloads/${VERSION}.iso
