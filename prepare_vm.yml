@@ -9,6 +9,8 @@
 
 - hosts: vcenter
   tasks:
+    - command: service-control --stop
+      ignore_errors: yes
     - systemd:
         state: stopped
         name: '{{ item }}'
@@ -33,6 +35,7 @@
         - vmware-vmon
         - syslog
         - syslog.socket
+      ignore_errors: yes
     - command: "pkill -f '/usr/bin/python /usr/lib/applmgmt/ddns/py/ddns.py'"
       ignore_errors: yes
 
@@ -135,4 +138,16 @@
     - lineinfile:
         dest: /etc/ssh/sshd_config
         regexp: '^PermitRootLogin'
-        line: 'PermitRootLogin No'
+        line: 'PermitRootLogin Yes'
+    - lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+    - name: Purge cloud-init files
+      file:
+        path: /var/lib/cloud
+        state: absent
+    - systemd:
+        enabled: true
+        name: cloud-init
+

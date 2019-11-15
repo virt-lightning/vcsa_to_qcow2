@@ -1,9 +1,16 @@
 #!/bin/bash
 set -eux
-export VERSION=VMware-VCSA-all-6.7.0-14836122
+
+iso_path=$1
+if ! test -f ${iso_path}; then
+    echo usage ./run.sh /somewhere/VMware-VCSA-all-6.7.0-14367737.iso
+    exit 1
+fi
+
+VERSION=$(basename -s .iso ${iso_path})
 vl up
 vl ansible_inventory>inventory
-ansible-playbook install_vcsa.yml -i inventory -e vcenter_instance.installation.iso_path=~/Downloads/${VERSION}.iso
+ansible-playbook install_vcsa.yml -i inventory -e vcenter_instance.installation.iso_path=${iso_path}
 
 echo 'vcenter ansible_host=192.168.123.90 ansible_user=root ansible_password="!234AaAa56" ansible_python_interpreter=/usr/bin/python ansible_ssh_common_args="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"' > inventory
 
@@ -24,4 +31,4 @@ echo "You image is ready! Do use it:
 
     OpenStack:
         source ~/openrc.sh
-        openstack image create --disk-format qcow2 --container-format bare --file ${VERSION}.qcow2 --property hw_vif_model=e1000 --property hw_qemu_guest_agent=no --min-disk 20 --min-ram 9000 ${VERSION}"
+        openstack image create --disk-format qcow2 --container-format bare --file ${VERSION}.qcow2 --property hw_qemu_guest_agent=no --min-disk 20 --min-ram 9000 --property hw_vif_model=e1000 ${VERSION}"
