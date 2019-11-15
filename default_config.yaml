@@ -1,5 +1,5 @@
 username: root
 python_interpreter: /usr/bin/python
-memory: 9000
+memory: 12000
 default_nic_model: e1000
 vcpus: 2
