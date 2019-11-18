@@ -19,6 +19,14 @@ You can use it with OpenStack or Libvirt (e.g: VirtLightning).
 ./run.sh
 ```
 
+## OpenStack
+
+You can upload the image with the following command:
+
+```shell
+openstack image create --disk-format qcow2 --container-format bare --file VMware-VCSA-all-6.7.0-14836122.qcow2 --property hw_qemu_guest_agent=no --min-disk 20 --min-ram 9000 --property hw_vif_model=e1000 VMware-VCSA-all-6.7.0-14836122
+```
+
 ## Notes
 
 - the administrator password is `!234AaAa56`
