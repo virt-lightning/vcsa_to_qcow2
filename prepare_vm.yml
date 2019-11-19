@@ -75,7 +75,7 @@
             After=local-fs.target network-online.target network.target
             Wants=local-fs.target network-online.target network.target
             [Service]
-            ExecStart=/bin/bash -c "/bin/sleep 5; /usr/bin/systemctl restart systemd-networkd"
+            ExecStart=/bin/bash -c "/bin/sleep 25; /usr/bin/systemctl restart systemd-networkd"
             Type=oneshot
             [Install]
             WantedBy=multi-user.target
