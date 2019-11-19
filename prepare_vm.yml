@@ -146,9 +146,14 @@
         line: 'PasswordAuthentication no'
     - name: Purge cloud-init files
       file:
-        path: /var/lib/cloud
+        path: '{{ item }}'
         state: absent
-    - systemd:
-        enabled: true
-        name: cloud-init
-
+      with_items:
+        - /var/lib/cloud
+        - /var/log/cloud-init.log
+        - /var/log/cloud-init-output.log
+    - command: "systemctl enable {{ item }}"
+      with_items:
+        - cloud-init
+        - cloud-config
+        - cloud-init-local
