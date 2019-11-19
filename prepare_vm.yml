@@ -67,15 +67,16 @@
             [DHCP]
             UseDNS=yes
             UseMTU=yes
+            UseHostname=no
     - copy:
         dest: /lib/systemd/system/mtu_fix.service
         content: |
             [Unit]
-            Description=Work around for https://github.com/systemd/systemd/issues/9102
+            Description=Work around for https://github.com/systemd/systemd/issues/9102 and https://github.com/systemd/systemd/issues/9408
             After=local-fs.target network-online.target network.target
             Wants=local-fs.target network-online.target network.target
             [Service]
-            ExecStart=/bin/bash -c "/bin/sleep 25; /usr/bin/systemctl restart systemd-networkd"
+            ExecStart=/bin/bash -eux -c "sleep 5; systemctl stop systemd-networkd;systemctl stop systemd-networkd.socket; sleep 2; systemctl start systemd-networkd; systemctl start systemd-networkd.socket"
             Type=oneshot
             [Install]
             WantedBy=multi-user.target
