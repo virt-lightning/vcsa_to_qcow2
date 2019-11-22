@@ -15,6 +15,7 @@ ansible-playbook install_vcsa.yml -i inventory -e vcenter_instance.installation.
 echo 'vcenter ansible_host=192.168.123.90 ansible_user=root ansible_password="!234AaAa56" ansible_python_interpreter=/usr/bin/python ansible_ssh_common_args="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"' > inventory
 
 ansible-playbook prepare_vm.yml -i inventory
+ansible-playbook zuul_user.yml -i inventory
 
 # If we don't reboot the ESXi, the download fails with an err 500, probably because the VM disks are still used
 ansible-playbook shutdown_esxi.yml -i inventory
