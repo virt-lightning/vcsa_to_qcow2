@@ -32,4 +32,4 @@ echo "You image is ready! Do use it:
 
     OpenStack:
         source ~/openrc.sh
-        openstack image create --disk-format qcow2 --container-format bare --file ${VERSION}.qcow2 --property hw_qemu_guest_agent=no --min-disk 20 --min-ram 9000 --property hw_vif_model=e1000 ${VERSION}"
+        openstack image create --disk-format qcow2 --container-format bare --file ${VERSION}.qcow2 --property hw_qemu_guest_agent=no --min-disk 12 --min-ram 8000 --property hw_vif_model=e1000 ${VERSION}"
