@@ -72,11 +72,12 @@
         dest: /usr/local/bin/mtu_fix
         content: |
             #!/bin/bash
-            while true; do
+            for i in $(seq 20); do
                 sleep 5
                 if [ "$(ip r show default)" = "" ]; then
                     dhcp_mtu=$(journalctl -k -o cat|awk "/eth0 changing MTU from 1500 to/ {print \$8}"|tail -n1)
-                     ip l set mtu ${dhcp_mtu} eth0
+                    ip l set mtu ${dhcp_mtu} eth0
+                    exit
                 fi
             done
         mode: '0755'
