@@ -16,6 +16,7 @@ echo 'vcenter ansible_host=192.168.123.90 ansible_user=root ansible_password="!2
 
 ansible-playbook prepare_vm.yml -i inventory
 ansible-playbook zuul_user.yml -i inventory
+ansible-playbook add_local_ssh_pubkey.yml -i inventory
 
 # If we don't reboot the ESXi, the download fails with an err 500, probably because the VM disks are still used
 ansible-playbook shutdown_esxi.yml -i inventory

@@ -1,0 +1,7 @@
+- hosts: vcenter
+  tasks:
+      - name: Inject the local user's pubkey
+        authorized_key:
+          user: root
+          state: present
+          key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
