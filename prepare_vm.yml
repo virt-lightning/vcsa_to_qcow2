@@ -65,9 +65,34 @@
             [Network]
             DHCP=yes
             [DHCP]
-            UseDNS=yes
+            UseDNS=no
             UseMTU=yes
             UseHostname=no
+    - copy:
+        dest: /etc/dnsmasq.conf
+        content: |
+            listen-address=127.0.0.1
+            bind-interfaces
+            user=dnsmasq
+            group=dnsmasq
+            no-negcache
+            #no-hosts
+            log-queries
+            log-facility=/var/log/vmware/dnsmasq.log
+            domain-needed
+            dns-forward-max=150
+            cache-size=8192
+            neg-ttl=3600
+            server=1.1.1.1
+            server=8.8.8.8
+    - name: Remove any potential link pointing to /run/systemd/resolve/resolv.conf
+      file:
+        dest: /etc/resolv.conf
+        state: absent
+    - copy:
+        dest: /etc/resolv.conf
+        content: |
+            nameserver 127.0.0.1
     - copy:
         dest: /usr/local/bin/mtu_fix
         content: |
