@@ -197,3 +197,7 @@
         - cloud-init
         - cloud-config
         - cloud-init-local
+    - name: Disable root's password
+      user:
+        name: root
+        password: '!'
