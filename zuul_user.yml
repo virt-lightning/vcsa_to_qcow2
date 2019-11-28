@@ -5,9 +5,10 @@
           name: zuul
           comment: zuul-executor
           shell: /bin/bash
+          password: "$6$GUkqMukAyqY3Kj64$L.Md7sh0Vjuyg553QPxrqlLH/O1j8XL5NxOJ1Fq7ufTpcd3pwhOy3R93yOAhsR8f4MN1Ne70c6qtk5KjiYxQ4/"
       - copy:
           content: |
-             root ALL=(ALL) NOPASSWD:ALL
+             zuul ALL=(ALL) NOPASSWD:ALL
           dest: /etc/sudoers.d/90-zuul-user
       - name: Set authorized key for Zuul user
         authorized_key:
