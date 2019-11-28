@@ -178,10 +178,12 @@
         dest: /etc/ssh/sshd_config
         regexp: '^PermitRootLogin'
         line: 'PermitRootLogin Yes'
+
     - lineinfile:
         dest: /etc/ssh/sshd_config
-        regexp: '^PasswordAuthentication'
-        line: 'PasswordAuthentication no'
+        regexp: '^Banner'
+        line: '# Banner /etc/issue'
+
     - name: Purge cloud-init files
       file:
         path: '{{ item }}'
