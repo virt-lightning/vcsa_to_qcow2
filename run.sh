@@ -28,7 +28,7 @@ vl down
 
 echo "You image is ready! Do use it:
     Virt-Lightning:
-        sudo cp -v ${VERSION}.qcow2 default_config.yaml /var/lib/virt-lightning/pool/upstream/
+        sudo cp -v ${VERSION}.qcow2 /var/lib/virt-lightning/pool/upstream/
         sudo cp -v default_config.yaml /var/lib/virt-lightning/pool/upstream/${VERSION}.yaml
 
     OpenStack:
