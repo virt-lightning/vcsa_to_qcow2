@@ -30,6 +30,16 @@
     command: host vcenter.test 192.168.123.1
   - name: Validate the reverse DNS resolution of the vcsa IP
     shell: "nslookup vcenter.test 192.168.123.1|grep vcenter"
+  - name: Add Management Network VM Portgroup
+    vmware_portgroup:
+      hostname: '{{ hostvars["esxi-vcenter"].ansible_host }}'
+      username: root
+      password: '!234AaAa56'
+      esxi_hostname: 'esxi-vcenter'
+      switch: "vSwitch0"
+      portgroup: "VM Network"
+      validate_certs: no
+
   - import_role:
       name: vcenter-instance
     vars:
