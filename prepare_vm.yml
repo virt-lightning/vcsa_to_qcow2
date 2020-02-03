@@ -137,7 +137,7 @@
                  lock-passwd: false
             disable_root: false
             disable_vmware_customization: true
-            preserve_hostname: false
+            preserve_hostname: true
             datasource_list: [
                               NoCloud,
                               ConfigDrive,
@@ -149,8 +149,6 @@
              - write-files
              - growpart
              - resizefs
-             - set_hostname
-             - update_hostname
              - users-groups
              - ssh
             cloud_config_modules:
