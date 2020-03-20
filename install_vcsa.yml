@@ -5,6 +5,20 @@
     vcsa_ip: '192.168.123.90'
     datastore_name: local
   tasks:
+  - wait_for:
+      host: '{{ hostvars["esxi-vcenter"].ansible_host }}'
+      port: 443
+
+  - name: "wait for the ESXi"
+    uri:
+      url: 'https://{{ hostvars["esxi-vcenter"].ansible_host }}/ui/'
+      status_code: 200
+      validate_certs: false
+    register: result
+    until: result.status == 200
+    retries: 60
+    delay: 1
+
   - name: add the host in /etc/hosts
     lineinfile:
       dest: /etc/hosts
@@ -43,19 +57,15 @@
   - import_role:
       name: vcenter-instance
     vars:
-      vcenter_instance:
-        installation:
-          from: 'iso'
-        network:  # IP Configuration of the vcenter
-          address: '{{ vcsa_ip }}'
-          prefix: 24
-          gateway: 192.168.123.1
-          dns: 192.168.123.1
-          hostname: vcenter.test
-        esxi:
-          hostname: '{{ hostvars["esxi-vcenter"].ansible_host }}'
-          username: root
-          password: '!234AaAa56'
+      vcenter_instance_installation_from: 'iso'
+      vcenter_instance_network_address: '{{ vcsa_ip }}'
+      vcenter_instance_network_prefix: 24
+      vcenter_instance_network_gateway: 192.168.123.1
+      vcenter_instance_network_dns: 192.168.123.1
+      vcenter_instance_network_hostname: vcenter.test
+      vcenter_instance_esxi_hostname: '{{ hostvars["esxi-vcenter"].ansible_host }}'
+      vcenter_instance_esxi_username: root
+      vcenter_instance_esxi_password: '!234AaAa56'
 
   - name: clean up the host in /etc/hosts
     lineinfile:

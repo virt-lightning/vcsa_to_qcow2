@@ -9,6 +9,8 @@
 
 - hosts: vcenter
   tasks:
+    - name: Ensure the root user is not locked
+      command: "usermod -U root"
     - command: service-control --stop
       ignore_errors: yes
     - systemd:
@@ -50,13 +52,31 @@
             rm -r ${mount_point}
             mv -f ${mount_point}.new ${mount_point}
         done
+    - command: swapon --ifexists --show=UUID
+      register: swap_list
     - copy:
-        dest: /etc/fstab
         content: |
-            /dev/vda3 / ext4 defaults 1 1
-            /dev/vda2       swap    swap    defaults        0       0
-            /dev/vda1 /boot ext4 defaults,nosuid,noacl,nodev,noexec 1 2
-            /dev/cdrom /mnt/cdrom iso9660 ro,noauto,nosuid,nodev 0 0
+          {% for i in ansible_mounts %}
+          {% if i.mount in ['/', '/boot'] %}
+          UUID={{ i.uuid }} {{ i.mount }} {{ i.fstype }} defaults 1 1
+          {% endif %}
+          {% endfor %}
+          UUID={{ swap_list.stdout_lines[1] }} swap swap       defaults 0 0
+        dest: /etc/fstab
+    - name: Refresh the initrd to include virtio drivers
+      shell:
+        dracut -H -f --add-drivers "tmem cn $(find /lib/modules -type f -name *virt* -exec basename {} \;|sed s,.ko.xz,,)" $(ls /boot/initrd.img-*)
+      when: ansible_distribution_version != '1.0'
+    - name: Turn on serial console
+      lineinfile:
+        path: /boot/photon.cfg
+        regexp: '^photon_cmdline=.*'
+        line: photon_cmdline=init=/lib/systemd/systemd ro loglevel=7 no-vmw-sta console=ttyS0,9600 console=ttyS0 systemd.journald.forward_to_console=1 systemd.log_level=debug systemd.debug-shell=1
+
+        # path: /boot/grub/grub.cfg
+        #serial --unit=0 --speed=9600
+        #terminal --timeout=5 serial console
+
     - copy:
         dest: /etc/systemd/network/10-eth0.network
         content: |

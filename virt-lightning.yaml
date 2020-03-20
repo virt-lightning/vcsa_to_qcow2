@@ -1,7 +1,7 @@
 - name: esxi-vcenter
   distro: esxi-6.7.0-20190802001-STANDARD
   memory: 12000
-  root_disk_size: 30
+  root_disk_size: 50
   vcpus: 2
   root_password: '!234AaAa56'
   groups: ['all_esxi']
