@@ -11,6 +11,9 @@
   tasks:
     - name: Ensure the root user is not locked
       command: "usermod -U root"
+    - name: install growfs
+      command: yum install -y cloud-utils
+      when: ansible_distribution_version != '1.0'
     - command: service-control --stop
       ignore_errors: yes
     - systemd:
