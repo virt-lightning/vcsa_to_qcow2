@@ -82,6 +82,12 @@
         #serial --unit=0 --speed=9600
         #terminal --timeout=5 serial console
 
+    - name: Turn off pam_tally2
+      lineinfile:
+        path: /etc/pam.d/system-auth
+        regexp: '^auth.*pam_tally2.so.*'
+        state: absent
+
     - copy:
         dest: /etc/systemd/network/10-eth0.network
         content: |
@@ -206,6 +212,11 @@
         dest: /etc/ssh/sshd_config
         regexp: '^Banner'
         line: '# Banner /etc/issue'
+
+    - lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: '^MaxAuthTries'
+        state: absent
 
     - name: Purge cloud-init files
       file:
