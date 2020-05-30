@@ -161,7 +161,7 @@
             [Resolve]
             LLMNR=false
 
-    - name: Inject the SSH key in /root/.ssh/authorized_keys
+    - name: Configure Cloud-init
       copy:
         dest: /etc/cloud/cloud.cfg
         content: |
