@@ -1,4 +1,6 @@
 - hosts: vcenter
+  collections:
+      - ansible.posix
   tasks:
       - name: Add the Zuul user
         user:
