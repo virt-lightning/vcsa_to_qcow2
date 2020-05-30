@@ -28,7 +28,9 @@ sleep 300
 ssh root@192.168.123.5 sh -c 'reboot&'
 sleep 300
 curl -v -k --user 'root:!234AaAa56' -o vCenterServerAppliance.raw 'https://192.168.123.5/folder/vCenter-Server-Appliance/vCenter-Server-Appliance-flat.vmdk?dcPath=ha%252ddatacenter&dsName=local'
-qemu-img convert -f raw -O qcow2 -c vCenterServerAppliance.raw ${VERSION}.qcow2
+
+mkdir -p tmp
+virt-sparsify --tmp tmp --compress --convert qcow2 vCenterServerAppliance.raw ${VERSION}.qcow2
 vl down
 
 echo "You image is ready! Do use it:
