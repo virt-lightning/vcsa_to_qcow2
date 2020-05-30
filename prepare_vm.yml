@@ -69,8 +69,11 @@
           UUID={{ swap_list.stdout_lines[1] }} swap swap       defaults 0 0
         dest: /etc/fstab
     - name: Refresh the initrd to include virtio drivers
-      shell:
-        dracut -H -f --add-drivers "tmem cn $(find /lib/modules -type f -name *virt* -exec basename {} \;|sed s,.ko.xz,,)" $(ls /boot/initrd.img-*)
+      shell: |
+        set -eux
+        target=$(ls /boot/initrd.img-*)
+        modules="tmem cn $(find /lib/modules -type f -name *virt* -exec basename -s .ko.xz {} \;)"
+        dracut -H -f --add-drivers "$modules" --force-drivers virtio-blk $target 2>&1| tee /root/dracut.log
       when: ansible_distribution_version != '1.0'
     - name: Turn on serial console
       lineinfile:
