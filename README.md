@@ -12,6 +12,9 @@ You can use it with OpenStack or Libvirt (e.g: VirtLightning).
 - a functional Virt-Lightning installation ( https://virt-lightning.org/ )
 - an ESXi image ( https://github.com/virt-lightning/esxi-cloud-images )
 - an ISO image
+- some extra Ansible dependencies:
+    - `ansible-galaxy install -r requirements.yaml -p roles/`
+    - `ansible-galaxy collection install community.vmware`
 
 ## Usage
 

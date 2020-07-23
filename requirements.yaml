@@ -1,0 +1,2 @@
+- name: goneri.vcenter-instance
+  src: git+https://github.com/goneri/ansible-role-vcenter-instance
