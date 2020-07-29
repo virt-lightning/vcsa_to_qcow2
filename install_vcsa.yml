@@ -57,7 +57,7 @@
       validate_certs: no
 
   - import_role:
-      name: vcenter-instance
+      name: goneri.vcenter-instance
     vars:
       vcenter_instance_installation_from: 'iso'
       vcenter_instance_network_address: '{{ vcsa_ip }}'
