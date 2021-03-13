@@ -30,8 +30,53 @@ sleep 300
 curl -v -k --user 'root:!234AaAa56' -o vCenterServerAppliance.raw 'https://192.168.123.5/folder/vCenter-Server-Appliance/vCenter-Server-Appliance-flat.vmdk?dcPath=ha%252ddatacenter&dsName=local'
 
 mkdir -p tmp
-virt-sparsify --tmp tmp --compress --convert qcow2 vCenterServerAppliance.raw ${VERSION}.qcow2
+
 vl down
+virt-df vCenterServerAppliance.raw
+## since 7.0.1
+if [ ${VERSION} = "VMware-VCSA-all-7.0.1-16860138" ]; then
+    guestfish <<_EOF_
+add vCenterServerAppliance.raw
+run
+list-filesystems
+e2fsck-f /dev/sda3
+resize2fs-size /dev/sda3 10G
+e2fsck-f /dev/sda3
+q
+_EOF_
+    virt-df vCenterServerAppliance.raw
+    truncate -s 12G shrinked.raw
+    virt-resize --shrink /dev/sda3 vCenterServerAppliance.raw shrinked.raw
+    virt-df shrinked.raw
+    virt-sparsify --tmp tmp --compress --convert qcow2 shrinked.raw ${VERSION}.qcow2
+
+elif [ ${VERSION} = "VMware-VCSA-all-7.0.2-17694817" ]; then
+    guestfish <<_EOF_
+add vCenterServerAppliance.raw
+run
+list-filesystems
+resize2fs-size /dev/vg_root_0/lv_root_0 10G
+lvresize /dev/vg_root_0/lv_root_0 11000
+e2fsck /dev/vg_root_0/lv_root_0 correct:true
+pvresize-size /dev/sda4 11634335744
+
+
+pvcreate /dev/sda2
+vgcreate swap_vg /dev/sda2
+lvcreate-free swap1 swap_vg 100
+mkswap /dev/mapper/swap_vg-swap1
+lvm-clear-filter
+lvm-scan true
+q
+_EOF_
+    virt-df vCenterServerAppliance.raw
+    truncate -s 12G shrinked.raw
+    virt-resize --shrink /dev/sda4 vCenterServerAppliance.raw shrinked.raw
+    virt-df shrinked.raw
+    virt-sparsify --tmp tmp --compress --convert qcow2 shrinked.raw ${VERSION}.qcow2
+else :
+    virt-sparsify --tmp tmp --compress --convert qcow2 vCenterServerAppliance.raw ${VERSION}.qcow2
+fi
 
 echo "You image is ready! Do use it:
     Virt-Lightning:

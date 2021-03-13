@@ -50,6 +50,9 @@
         set -eux
         for mount_point in $(mount|awk '/mapper/ { print $3 }'); do
             echo $mount_point
+            if [ $mount_point = "/" ]; then
+                continue
+            fi
             if ! test -d ${mount_point}.new; then
                 cp -Rvpa ${mount_point} ${mount_point}.new
             fi
@@ -66,14 +69,14 @@
           UUID={{ i.uuid }} {{ i.mount }} {{ i.fstype }} defaults 1 1
           {% endif %}
           {% endfor %}
-          UUID={{ swap_list.stdout_lines[1] }} swap swap       defaults 0 0
+          /dev/mapper/swap_vg-swap1 swap swap       defaults 0 0
         dest: /etc/fstab
     - name: Refresh the initrd to include virtio drivers
       shell: |
         set -eux
         target=$(ls /boot/initrd.img-*)
         modules="tmem cn $(find /lib/modules -type f -name *virt* -exec basename -s .ko.xz {} \;)"
-        dracut -H -f --add-drivers "$modules" --force-drivers virtio-blk $target 2>&1| tee /root/dracut.log
+        dracut -H -f --add-drivers "$modules" --force-drivers virtio-blk -o resume --no-hostonly-cmdline $target  2>&1| tee /root/dracut.log
       when: ansible_distribution_version != '1.0'
     - name: Turn on serial console
       lineinfile:
@@ -90,76 +93,6 @@
         path: /etc/pam.d/system-auth
         regexp: '^auth.*pam_tally2.so.*'
         state: absent
-
-    - copy:
-        dest: /etc/systemd/network/10-eth0.network
-        content: |
-            [Match]
-            Name=eth0
-            [Network]
-            DHCP=yes
-            [DHCP]
-            UseDNS=no
-            UseMTU=yes
-            UseHostname=no
-    - copy:
-        dest: /etc/dnsmasq.conf
-        content: |
-            listen-address=127.0.0.1
-            bind-interfaces
-            user=dnsmasq
-            group=dnsmasq
-            no-negcache
-            #no-hosts
-            log-queries
-            log-facility=/var/log/vmware/dnsmasq.log
-            domain-needed
-            dns-forward-max=150
-            cache-size=8192
-            neg-ttl=3600
-            server=1.1.1.1
-            server=8.8.8.8
-    - name: Remove any potential link pointing to /run/systemd/resolve/resolv.conf
-      file:
-        dest: /etc/resolv.conf
-        state: absent
-    - copy:
-        dest: /etc/resolv.conf
-        content: |
-            nameserver 127.0.0.1
-    - copy:
-        dest: /usr/local/bin/mtu_fix
-        content: |
-            #!/bin/bash
-            for i in $(seq 20); do
-                sleep 5
-                if [ "$(ip r show default)" = "" ]; then
-                    dhcp_mtu=$(journalctl -k -o cat|awk "/eth0 changing MTU from 1500 to/ {print \$8}"|tail -n1)
-                    ip l set mtu ${dhcp_mtu} eth0
-                    exit
-                fi
-            done
-        mode: '0755'
-    - copy:
-        dest: /lib/systemd/system/mtu_fix.service
-        content: |
-            [Unit]
-            Description=Work around for https://github.com/systemd/systemd/issues/9102 and https://github.com/systemd/systemd/issues/9408
-            After=local-fs.target network-online.target network.target
-            Wants=local-fs.target network-online.target network.target
-            [Service]
-            ExecStart=/usr/local/bin/mtu_fix
-            Type=oneshot
-            [Install]
-            WantedBy=multi-user.target
-    - systemd:
-        enabled: true
-        name: mtu_fix
-    - copy:
-        dest: /etc/systemd/resolved.conf
-        content: |
-            [Resolve]
-            LLMNR=false
 
     - name: Configure Cloud-init
       copy:
@@ -206,6 +139,31 @@
                  name: root
                  lock_passwd: False
                ssh_svcname: sshd
+
+    - name: 'Update the growpart copy (Fix: https://bugs.launchpad.net/cloud-utils/+bug/1799953)'
+      get_url:
+        url: https://raw.githubusercontent.com/canonical/cloud-utils/master/bin/growpart
+        dest: /usr/bin/growpart
+        mode: '0755'
+    - name: vSphere 7.0.2 uses LVM and cloud-init cannot resize that
+      copy:
+        dest: /etc/rc.d/rc.local
+        content: |
+            #!/bin/sh
+            ## workaround for vcsa_to_qcow2
+            # Ensure we can resize the LVL root FS, cloud-init cannot do it.
+            growpart /dev/vda 4
+            pvresize /dev/vda4
+            growpart /dev/sda 4
+            pvresize /dev/sda4
+            lvextend -l 100%FREE /dev/vg_root_0/lv_root_0
+            resize2fs /dev/vg_root_0/lv_root_0
+            # Ensure netmgr can 'see' nic0
+            netmgr link_info --set --interface eth0 --state up
+            netmgr ip4_address --set --interface eth0 --mode dhcp
+            netmgr dns_servers --set --mode dhcp
+            exit 0
+        mode: '0755'
     - lineinfile:
         dest: /etc/ssh/sshd_config
         regexp: '^PermitRootLogin'
