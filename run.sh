@@ -46,7 +46,7 @@ q
 _EOF_
     virt-df vCenterServerAppliance.raw
     truncate -s 12G shrinked.raw
-    virt-resize --shrink /dev/sda3 vCenterServerAppliance.raw shrinked.raw
+    virt-resize --no-sparse --shrink /dev/sda3 vCenterServerAppliance.raw shrinked.raw
     virt-df shrinked.raw
     virt-sparsify --tmp tmp --compress --convert qcow2 shrinked.raw ${VERSION}.qcow2
 
@@ -71,7 +71,7 @@ q
 _EOF_
     virt-df vCenterServerAppliance.raw
     truncate -s 12G shrinked.raw
-    virt-resize --shrink /dev/sda4 vCenterServerAppliance.raw shrinked.raw
+    virt-resize --no-sparse --shrink /dev/sda4 vCenterServerAppliance.raw shrinked.raw
     virt-df shrinked.raw
     virt-sparsify --tmp tmp --compress --convert qcow2 shrinked.raw ${VERSION}.qcow2
 else :
