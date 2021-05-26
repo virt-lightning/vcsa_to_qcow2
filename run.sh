@@ -14,7 +14,7 @@ vl ansible_inventory>inventory
 extra_args="vcenter_instance_installation_iso_path=${iso_path}"
 ansible-playbook install_vcsa.yml -i inventory -e "${extra_args}" -vvv
 
-echo 'vcenter ansible_host=192.168.123.90 ansible_user=root ansible_password="!234AaAa56" ansible_python_interpreter=/usr/bin/python ansible_ssh_common_args="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentitiesOnly=yes"' > inventory
+echo 'vcenter ansible_host=192.168.123.90 ansible_user=root ansible_password="!234AaAa56" ansible_python_interpreter=/usr/bin/python ansible_ssh_common_args="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o PubkeyAuthentication=no"' > inventory
 
 ansible-playbook prepare_vm.yml -i inventory -vvv
 ansible-playbook zuul_user.yml -i inventory
