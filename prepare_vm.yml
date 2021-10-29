@@ -42,8 +42,11 @@
         - vmware-vmon
         - syslog
         - syslog.socket
+        - lwsmd
       ignore_errors: yes
     - command: "pkill -f '/usr/bin/python /usr/lib/applmgmt/ddns/py/ddns.py'"
+      ignore_errors: yes
+    - command: "pkill -f /usr/lib/vmware-capengine/capengine"
       ignore_errors: yes
 
     - shell: |
@@ -69,7 +72,7 @@
           UUID={{ i.uuid }} {{ i.mount }} {{ i.fstype }} defaults 1 1
           {% endif %}
           {% endfor %}
-          /dev/mapper/swap_vg-swap1 swap swap       defaults 0 0
+          # /dev/mapper/swap_vg-swap1 swap swap       defaults 0 0
         dest: /etc/fstab
     - name: Refresh the initrd to include virtio drivers
       shell: |
