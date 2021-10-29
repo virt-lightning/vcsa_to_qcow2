@@ -1,6 +1,4 @@
 username: root
 python_interpreter: /usr/bin/python
 memory: 16000
-# virtio is broken with VMware-VCSA-all-6.7.0-14836122
-default_nic_model: e1000
 vcpus: 2
