@@ -1,4 +1,4 @@
 username: root
 python_interpreter: /usr/bin/python
-memory: 16000
+memory: 20000
 vcpus: 2

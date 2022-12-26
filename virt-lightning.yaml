@@ -1,11 +1,11 @@
 - name: esxi-vcenter
-  distro: esxi-6.7.0-20190802001-STANDARD
-  memory: 12000
-  root_disk_size: 50
-  vcpus: 2
+  distro: esxi-7.0U3F-20036589-STANDARD
+  memory: 18000
+  root_disk_size: 70
+  vcpus: 4
   root_password: '!234AaAa56'
   groups: ['all_esxi']
   networks:
   - network: virt-lightning
-    nic_model: e1000
+    nic_model: e1000e
     ipv4: 192.168.123.5
