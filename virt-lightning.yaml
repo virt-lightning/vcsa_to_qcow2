@@ -2,6 +2,8 @@
   distro: esxi-7.0U3F-20036589-STANDARD
   memory: 18000
   root_disk_size: 70
+  meta_data_media_type: cdrom
+  default_bus_type: sata
   vcpus: 4
   root_password: '!234AaAa56'
   groups: ['all_esxi']
